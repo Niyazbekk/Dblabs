@@ -1,0 +1,173 @@
+1)
+
+DECLARE
+CURSOR cur_depts(dep_id Number) IS
+SELECT department_name,first_name , last_name , salary from departments d, employees e where d.department_id = dep_id;
+v_dep_name VARCHAR(200);
+v_first_name VARCHAR(200);
+v_last_name VARCHAR(200);
+v_salary NUMBER;
+BEGIN
+OPEN cur_depts(10);
+LOOP
+FETCH cur_depts INTO v_dep_name,v_first_name,v_last_name,v_salary;
+EXIT WHEN cur_depts%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_dep_name||' '||v_first_name ||' '|| v_last_name||' '|| v_salary);
+END LOOP;
+CLOSE cur_depts;
+END;
+
+
+2)
+
+
+DECLARE
+CURSOR cur_reg IS
+select region_name , country_name from regions , countries where regions.region_id = countries.region_id;
+v_reg_name VARCHAR(200);
+v_con_name VARCHAR(200);
+BEGIN
+OPEN cur_reg;
+LOOP
+FETCH cur_reg INTO v_reg_name,v_con_name;
+EXIT WHEN cur_reg%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_reg_name||' '||v_con_name);
+END LOOP;
+CLOSE cur_reg;
+END;
+
+
+3)
+
+DECLARE
+ CURSOR DATE_CURSOR(JOIN_DATE DATE) IS
+ SELECT employee_id,last_name,hire_date FROM employees
+ WHERE HIRE_DATE >JOIN_DATE ;
+ E_id NUMBER;
+ E_last_name VARCHAR(50);
+ HIREDATE DATE;
+ HDATE DATE := '&P_HIREDATE';
+ BEGIN
+ OPEN DATE_CURSOR(HDATE);
+ LOOP
+ FETCH DATE_CURSOR INTO E_id,E_last_name,HIREDATE;
+ EXIT WHEN DATE_CURSOR%NOTFOUND;
+ DBMS_OUTPUT.PUT_LINE (E_id || ' ' || E_last_name || ' ' || HIREDATE);
+ END LOOP;
+ END;
+/ 
+
+08-03-00
+
+4)
+
+BEGIN
+  INSERT Into proposed_raises(first_name,Last_name,Salary,date_proposed,date_approve,proposed_new_salary )
+     SELECT first_name , last_name , salary , sysdate , null , salary*1.05 FROM employees where salary < 5000;
+END;
+
+5)
+1.
+DECLARE
+CURSOR cur_reg(REG NUMBER) IS
+select Country_name , country_id from countries where region_id = REG;
+v_con_id CHAR(2);
+v_con_name VARCHAR(200);
+REGI NUMBER(5) := &REG;
+BEGIN
+OPEN cur_reg(REGI);
+LOOP
+FETCH cur_reg INTO v_con_name,v_con_id;
+EXIT WHEN cur_reg%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_con_name||' '||v_con_id);
+END LOOP;
+CLOSE cur_reg;
+END;
+
+2.
+
+BEGIN
+FOR v_emp_record IN (select Country_name , country_id from countries where region_id = 2)
+LOOP
+DBMS_OUTPUT.PUT_LINE(v_emp_record.Country_name || ' '
+|| v_emp_record.country_id);
+
+END LOOP;
+END;
+
+
+6)
+
+DECLARE
+CURSOR c_nr_emp IS
+SELECT d.department_name, count(e.employee_id)
+ FROM departments d, employees e
+ WHERE d.department_id=e.department_id
+GROUP BY d.department_name
+ORDER BY 2 DESC;
+v_dept_name VARCHAR(50);
+v_nr NUMBER;
+BEGIN
+DBMS_OUTPUT.PUT_LINE('־עהוכû:');
+OPEN c_nr_emp;
+LOOP
+FETCH c_nr_emp INTO v_dept_name, v_nr;
+EXIT WHEN c_nr_emp%ROWCOUNT>5;
+DBMS_OUTPUT.PUT_LINE(v_dept_name||', '||v_nr);
+END LOOP;
+CLOSE c_nr_emp;
+END; 
+
+7)
+
+DECLARE
+CURSOR cur_depts(dep_id Number) IS
+SELECT department_name,first_name , last_name , salary from departments d, employees e where d.department_id = dep_id;
+v_dep_name VARCHAR(200);
+v_first_name VARCHAR(200);
+v_last_name VARCHAR(200);
+v_salary NUMBER;
+BEGIN
+OPEN cur_depts(10);
+LOOP
+FETCH cur_depts INTO v_dep_name,v_first_name,v_last_name,v_salary;
+EXIT WHEN cur_depts%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_dep_name);
+DBMS_OUTPUT.PUT_LINE('--------');
+DBMS_OUTPUT.PUT_LINE(v_first_name ||' '|| v_last_name||' '|| v_salary);
+DBMS_OUTPUT.PUT_LINE('--------');
+END LOOP;
+CLOSE cur_depts;
+END;
+
+
+8)
+Explicit cursors
+Cursor 
+procedure
+Implicit Cursor
+OPEN
+FETCH 
+Cursor 
+CLOSE
+
+9,10)
+
+DECLARE
+l_rt_emp employees%rowtype;
+CURSOR cur IS
+SELECT * FROM employee
+WHERE TO_CHAR(hire_date,'RRRR')<'2000' FOR UPDATE; 
+BEGIN
+OPEN cur;
+LOOP
+FETCH cur INTO l_rt_emp;
+EXIT WHEN cur%notfound;
+  INSERT INTO employees_archive VALUES l_rt_emp;
+  DELETE FROM employees 
+  WHERE CURRENT OF cur;
+END LOOP;
+Commit;
+CLOSE cur;
+END;
+/

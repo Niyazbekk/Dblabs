@@ -1,0 +1,115 @@
+1)
+set SERVEROUT on
+DECLARE
+CURSOR cur_Book IS
+SELECT TITLE , AUTHOR ,YEAR FROM BOOKS WHERE AUTHOR = 'Edmund Morgan' AND YEAR >= 1990 ;
+v_title VARCHAR(255);
+v_au VARCHAR(255);
+v_year int;
+
+BEGIN
+OPEN cur_Book;
+LOOP
+FETCH cur_Book INTO v_title,v_au,v_year;
+EXIT WHEN cur_Book%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_title ||' '|| v_au ||' '|| v_year);
+END LOOP;
+CLOSE cur_Book;
+END;
+
+
+2)
+
+set SERVEROUT on
+DECLARE
+CURSOR cur_Book IS
+SELECT TITLE, AUTHOR, PRICE FROM BOOKS, PRICING WHERE BOOKS.BOOK_ID =
+PRICING.BOOK_ID AND TITLE LIKE '%CIVIL WAR%' AND FORMAT = 'AUDIO';
+v_title VARCHAR(255);
+v_au VARCHAR(255);
+v_price int;
+
+BEGIN
+OPEN cur_Book;
+LOOP
+FETCH cur_Book INTO v_title,v_au,v_price;
+EXIT WHEN cur_Book%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_title ||' '|| v_au ||' '|| v_price);
+END LOOP;
+CLOSE cur_Book;
+END;
+
+
+3)
+
+set SERVEROUT on
+DECLARE
+CURSOR cur_Book IS
+SELECT YEAR, COUNT(*) FROM CUSTOMERS, PURCHASES WHERE
+CUSTOMERS.CUSTOMERID = PURCHASES.CUSTOMERID AND NAME = 'JOHN CHAMBERS'
+GROUP BY YEAR ;
+v_year int;
+v_count int;
+
+BEGIN
+OPEN cur_Book;
+LOOP
+FETCH cur_Book INTO v_year,v_count;
+EXIT WHEN cur_Book%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_year ||' '|| v_count);
+END LOOP;
+CLOSE cur_Book;
+END;
+
+4)
+
+set SERVEROUT on
+DECLARE
+CURSOR cur_Book IS
+SELECT NAME, EMAIL FROM CUSTOMERS WHERE CUSTOMERID IN (SELECT
+CUSTOMERID FROM PURCHASES WHERE YEAR =2003 GROUP BY CUSTOMERID HAVING
+COUNT(*) > 1);
+v_name VARCHAR(255);
+v_email VARCHAR(255);
+
+BEGIN
+OPEN cur_Book;
+LOOP
+FETCH cur_Book INTO v_name,v_email;
+EXIT WHEN cur_Book%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_name ||' '|| v_email );
+END LOOP;
+CLOSE cur_Book;
+END;
+
+5)
+
+set SERVEROUT on
+DECLARE
+CURSOR cur_Book IS
+SELECT TITLE, AUTHOR, AVG(RATING) FROM BOOKS, REVIEWS WHERE
+BOOKS.BOOK_ID = REVIEWS.BOOK_ID AND TITLE LIKE '%CIVIL WAR%' GROUP BY
+BOOKS.BOOK_ID, TITLE, AUTHOR ;
+v_title VARCHAR(255);
+v_author VARCHAR(255);
+v_RATE int;
+
+BEGIN
+OPEN cur_Book;
+LOOP
+FETCH cur_Book INTO v_title,v_author,v_RATE;
+EXIT WHEN cur_Book%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_title ||' '|| v_author || ' ' || v_RATE);
+END LOOP;
+CLOSE cur_Book;
+END;
+
+
+
+6)
+
+Collaborate with other libraries from the city and offer a combined library service
+
+Add tegs (No genre)
+
+Add books of the day

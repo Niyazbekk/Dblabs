@@ -1,0 +1,84 @@
+C:\Users\Asus\AppData\Roaming\SQL Developer
+
+
+1)
+
+CREATE PROCEDURE pro_department_report
+IS
+v_name varchar(255);
+v_dept varchar(255);
+V_count number;
+v_count_sname number;
+v_id number;
+BEGIN
+select count(dname) 
+Into v_count
+from department;
+FOR indx IN 
+   1 .. v_count
+   LOOP
+   select deptid 
+   into v_id
+   from department;
+   select sname, dname , count(sname)
+   into v_name , v_dept , v_count_sname
+   from student , department 
+   where student.deptid = v_id;
+   DBMS_OUTPUT.PUT_LINE('Department' || v_dept);
+   DBMS_OUTPUT.PUT_LINE('Total num of students :' || v_count_sname); 
+   DBMS_OUTPUT.PUT_LINE(indx ||'. ' || v_name);
+END LOOP;
+END pro_department_report;
+/
+
+
+2)
+
+CREATE PROCEDURE pro_student_stats
+IS
+v_name varchar(255);
+v_dept varchar(255);
+V_count number;
+v_count_d number;
+v_id number;
+BEGIN
+select count(sname) 
+Into v_count
+from student;
+FOR indx IN 
+   1 .. v_count
+   LOOP
+   DBMS_OUTPUT.PUT_LINE('Student Name      #Classes');
+   select count(deptid) 
+   Into v_count_d
+   from department;
+   select sname
+   into v_name
+   from student
+   where v_count_d > 0;
+   select count(deptid)
+   into v_dept 
+   from department
+   where deptid = (select deptid from student where sname = v_name);
+   DBMS_OUTPUT.PUT_LINE(v_name|| '     ' || v_dept); 
+END LOOP;
+END pro_student_stats;
+/
+
+4)
+
+CREATE PROCEDURE pro_enroll
+IS
+v_name varchar(255):= 'Lee';
+V_c number;
+v_ID number;
+BEGIN
+select snum
+into v_ID
+from student
+where sname = v_name;
+
+Insert into enrolled
+VALUES(v_ID , 'CS448');
+END pro_enroll;
+/

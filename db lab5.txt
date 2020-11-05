@@ -1,0 +1,159 @@
+1)
+
+A)
+A PL/SQL collection is basically the same as a variable, 
+it is stored in the memory just like one andcan basically take one or more places in a table
+and store it in the collection.
+
+B)
+1,3,4 Collections
+
+C)
+The database table holds more than just one column of data, which is what the INDEX BY tabledoes. 
+The database table can hold as many columns full of information as it would like to
+
+D)
+The INDEX BY table holds the information from a column within a database table, 
+and the INDEX BYtable of records holds the structure for a row in the same database table
+
+E)
+t_pops declares a type and v_pops_tab declares a variable of that type.
+v_pops_tab isan INDEX BY table (not of records) because each element is a single scalar variable (apopulation value).
+
+
+-----------------------------------
+
+
+2)
+
+
+A)
+DECLARE
+TYPE t_country_names IS TABLE OF 
+    countries.country_name%TYPE
+ INDEX BY VARCHAR2(20);
+v_country_names t_country_names;
+CURSOR country_curs IS
+ SELECT country_id, country_name
+ FROM countries
+ WHERE region_id = 4
+ ORDER BY country_id;
+ v_country_rec country_curs%ROWTYPE;
+ BEGIN
+ OPEN country_curs;
+ LOOP
+ FETCH country_curs INTO v_country_rec;
+ EXIT WHEN country_curs%NOTFOUND;
+ v_country_names(v_country_rec.country_id) :=v_country_rec.country_name;
+ END LOOP;
+ CLOSE country_curs;
+ END;
+
+B)
+ DECLARE
+ TYPE t_country_names IS TABLE OF
+    countries.country_name%TYPE
+  INDEX BY VARCHAR2(20);
+ v_country_names t_country_names;
+ CURSOR country_curs IS
+SELECT country_id , country_name
+ FROM countries
+ WHERE region_id = 1
+ ORDER BY country_id;
+ v_country_rec country_curs%ROWTYPE;
+ BEGIN
+ OPEN country_curs;
+ LOOP
+ FETCH country_curs INTO v_country_rec;
+ EXIT WHEN country_curs%NOTFOUND;
+ v_country_names(v_country_rec.country_id) := v_country_rec.country_name;
+ END LOOP;
+ CLOSE country_curs;
+ FOR i IN v_country_names.FIRST..v_country_names.LAST
+ LOOP
+    IF v_country_names.EXISTS(i) THEN
+        DBMS_OUTPUT.PUT_LINE(i || ' ' || v_country_names(i));
+    END IF;
+END LOOP;
+END;
+
+C)
+
+ DECLARE
+ TYPE t_country_names IS TABLE OF
+    countries.country_name%TYPE
+  INDEX BY VARCHAR2(20);
+ v_country_names t_country_names;
+ CURSOR country_curs IS
+SELECT country_id , country_name
+ FROM countries
+ WHERE region_id = 1
+ ORDER BY country_id;
+ v_country_rec country_curs%ROWTYPE;
+ BEGIN
+ OPEN country_curs;
+ LOOP
+ FETCH country_curs INTO v_country_rec;
+ EXIT WHEN country_curs%NOTFOUND;
+ v_country_names(v_country_rec.country_id) := v_country_rec.country_name;
+ END LOOP;
+ CLOSE country_curs;
+DBMS_OUTPUT.PUT_LINE(v_country_names.FIRST || ' ' ||v_country_names(v_country_names.FIRST));
+DBMS_OUTPUT.PUT_LINE(v_country_names.LAST || ' ' ||v_country_names(v_country_names.LAST));
+DBMS_OUTPUT.PUT_LINE('Number of countries is: ' ||v_country_names.COUNT);
+END;
+
+
+3)
+
+A)
+
+Declare 
+Cursor emp_curs IS
+ SELECT employee_id , last_name , job_id , salary
+ from employees
+ ORDER BY employee_id;
+v_emp_rec emp_curs%ROWTYPE;
+TYPE t_emp_data IS TABLE OF
+    emp_curs%ROWTYPE
+    INDEX BY BINARY_INTEGER;
+v_emp_data t_emp_data;
+BEGIN
+OPEN emp_curs;
+LOOP
+FETCH emp_curs INTO v_emp_rec;
+EXIT WHEN emp_curs%NOTFOUND;
+v_emp_data(v_emp_rec.employee_id) := v_emp_rec;
+END LOOP;
+CLOSE emp_curs;
+END;
+
+B)
+
+Declare 
+Cursor emp_curs IS
+ SELECT employee_id , last_name , job_id , salary
+ from employees
+ ORDER BY employee_id;
+v_emp_rec emp_curs%ROWTYPE;
+TYPE t_emp_data IS TABLE OF
+    emp_curs%ROWTYPE
+    INDEX BY BINARY_INTEGER;
+v_emp_data t_emp_data;
+BEGIN
+OPEN emp_curs;
+LOOP
+FETCH emp_curs INTO v_emp_rec;
+EXIT WHEN emp_curs%NOTFOUND;
+v_emp_data(v_emp_rec.employee_id) := v_emp_rec;
+END LOOP;
+CLOSE emp_curs;
+FOR i IN v_emp_data.FIRST .. v_emp_data.LAST
+LOOP
+ IF v_emp_data.EXISTS(i) THEN
+  DBMS_OUTPUT.PUT_LINE(v_emp_data(i).employee_id || ' ' 
+  || v_emp_data(i).job_id || ' ' 
+  || v_emp_data(i).salary);
+  END IF;
+END LOOP;
+END;

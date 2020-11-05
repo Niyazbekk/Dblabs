@@ -1,0 +1,185 @@
+ set serveroutput on
+ 
+ 
+BEGIN
+    EXECUTE IMMEDIATE 'CREATE TABLE Tictac(
+      y NUMBER,
+      A CHAR,
+      B CHAR,
+      C CHAR
+    )';
+END;
+/
+
+
+CREATE OR REPLACE FUNCTION nToCol(n IN NUMBER)
+RETURN CHAR
+IS
+BEGIN
+  IF n = 1 THEN
+    RETURN 'A';
+  ELSIF n = 2 THEN
+    RETURN 'B';
+  ELSIF n = 3 THEN
+    RETURN 'C';
+  ELSE 
+    RETURN '_';
+  END IF;
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE print_game IS
+BEGIN
+  dbms_output.enable(10000);
+  dbms_output.put_line(' ');
+  FOR ll in (SELECT * FROM Tictac ORDER BY Y) LOOP
+    dbms_output.put_line('     ' || ll.A || ' ' || ll.B || ' ' || ll.C);
+  END LOOP; 
+  dbms_output.put_line(' ');
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE reset_game IS
+i NUMBER;
+BEGIN
+  DELETE FROM Tictac;
+  FOR i in 1..3 LOOP
+    INSERT INTO Tictac VALUES (i,'_','_','_');
+  END LOOP; 
+  dbms_output.enable(10000);
+  print_game();
+END;
+/
+
+
+CREATE OR REPLACE PROCEDURE play(symbole IN VARCHAR2, colonb IN NUMBER, lineR IN NUMBER) IS
+val Tictac.a%type;
+sym CHAR;
+symbole2 CHAR;
+BEGIN
+  SELECT nToCol(colonb) INTO sym FROM DUAL;
+  EXECUTE IMMEDIATE ('SELECT ' || sym || ' FROM Tictac WHERE y=' || lineR) INTO val;
+  IF val='_' THEN
+    EXECUTE IMMEDIATE ('UPDATE Tictac SET ' || sym || '=''' || symbole || ''' WHERE y=' || lineR);
+    IF symbole='X' THEN
+      symbole2:='O';
+    ELSE
+      symbole2:='X';
+    END IF;
+    print_game();
+    dbms_output.put_line('Очередь:' || symbole2);
+  ELSE
+    dbms_output.enable(10000);
+    dbms_output.put_line('Уже выбран');
+  END IF;
+END;
+/
+CREATE OR REPLACE PROCEDURE winner(symbole IN VARCHAR2) IS
+BEGIN
+  dbms_output.enable(10000);
+  print_game();
+  dbms_output.put_line('Выиграл' || symbole); 
+  dbms_output.put_line('---------------------------------------');
+END;
+/
+
+CREATE OR REPLACE FUNCTION wincol_request(nomcol IN VARCHAR2, symbole IN VARCHAR2)
+RETURN VARCHAR2
+IS
+BEGIN
+  RETURN ('SELECT COUNT(*) FROM Tictac WHERE ' || nomcol || ' = '''|| symbole ||''' AND ' || nomcol || ' != ''_''');
+END;
+/
+
+CREATE OR REPLACE FUNCTION wincross_request(nomcol IN VARCHAR2, yvalue IN NUMBER)
+RETURN VARCHAR2
+IS
+BEGIN
+  RETURN ('SELECT '|| nomcol ||' FROM Tictac WHERE y=' || yvalue);
+END;
+/
+
+CREATE OR REPLACE FUNCTION wincol(nomcol IN VARCHAR2)
+RETURN CHAR
+IS
+  nbwin NUMBER;
+  r VARCHAR2(56);
+BEGIN
+  SELECT wincol_request(nomcol, 'X') into r FROM DUAL;
+  EXECUTE IMMEDIATE r INTO nbwin;
+  IF nbwin=3 THEN
+    RETURN 'X';
+  ELSIF nbwin=0 THEN
+    SELECT wincol_request(nomcol, 'O') into r FROM DUAL;
+    EXECUTE IMMEDIATE r INTO nbwin;
+    IF nbwin=3 THEN
+      RETURN 'O';
+    END IF;
+  END IF;
+  RETURN '_';
+END;
+/
+
+CREATE OR REPLACE FUNCTION wincross(tmpx IN CHAR, numcol IN NUMBER, numligne IN NUMBER)
+RETURN CHAR
+IS
+  tmpvar CHAR;
+  tmpxvar CHAR;
+  r VARCHAR2(56);
+BEGIN
+  SELECT wincross_request(nToCol(numcol), numligne) INTO r FROM DUAL;
+  IF tmpx IS NULL THEN
+    EXECUTE IMMEDIATE (r) INTO tmpxvar;
+  ELSIF NOT tmpx = '_' THEN
+    EXECUTE IMMEDIATE (r) INTO tmpvar;
+    IF NOT tmpx = tmpvar THEN
+      tmpxvar := '_';
+    END IF;
+  ELSE
+    tmpxvar := '_';
+  END IF;
+  RETURN tmpxvar;
+END;
+/
+CREATE OR REPLACE TRIGGER iswinner
+AFTER UPDATE ON Tictac
+DECLARE
+  CURSOR cr_ligne IS 
+    SELECT * FROM Tictac ORDER BY Y; 
+  crlv Tictac%rowtype;
+  tmpvar CHAR;
+  tmpx1 CHAR;
+  tmpx2 CHAR;
+  r VARCHAR2(40);
+BEGIN
+  FOR crlv IN cr_ligne LOOP
+    IF crlv.A = crlv.B AND crlv.B = crlv.C AND NOT crlv.A='_' THEN
+      winner(crlv.A);
+      EXIT;
+    END IF;
+    SELECT wincol(nToCol(crlv.Y)) INTO tmpvar FROM DUAL;
+    IF NOT tmpvar = '_' THEN
+      winner(tmpvar);
+      EXIT;
+    END IF;
+    SELECT wincross(tmpx1, crlv.Y, crlv.Y) INTO tmpx1 FROM dual;
+    SELECT wincross(tmpx2, 4-crlv.Y, crlv.Y) INTO tmpx2 FROM dual;
+  END LOOP;
+  IF NOT tmpx1 = '_' THEN
+    winner(tmpx1);
+  END IF;
+  IF NOT tmpx2 = '_' THEN
+    winner(tmpx2);
+  END IF;
+END;
+/
+
+
+EXECUTE reset_game;
+EXECUTE play('X', 1, 3);
+EXECUTE play('O', 2, 1);
+EXECUTE play('X', 2, 2);
+EXECUTE play('O', 2, 3);
+EXECUTE play('X', 2, 1);

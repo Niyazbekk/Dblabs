@@ -1,0 +1,114 @@
+
+2,3)
+set serveroutput on
+
+DECLARE 
+   message  varchar2(20):= 'Hello, World!'; 
+BEGIN 
+   dbms_output.put_line(message); 
+END;
+
+
+4)
+
+DECLARE
+  incentive   NUMBER;
+BEGIN
+  SELECT salary INTO incentive
+  FROM employees
+  WHERE employee_id = 110;
+DBMS_OUTPUT.PUT_LINE('Incentive  = ' || TO_CHAR(incentive));
+END;
+
+5)
+
+declare
+    first_n varchar(20);
+    last_n varchar(20);
+begin
+    select first_name, last_name into first_n, last_n from employees
+    where salary > (select salary from employees where employee_id=163);
+    dbms_output.put_line(first_n || ' ' || last_n);
+    exception
+    when too_many_rows then
+    dbms_output.put_line('Too many rows in the answer!');
+end;
+
+6)
+
+DECLARE
+    v_count NUMBER;
+    v_coun NUMBER;
+    v_dif NUMBER;
+BEGIN
+    SELECT max(salary) , min(salary)
+    into v_count, v_coun
+    FROM employees;
+    DBMS_OUTPUT.put_line (v_count);
+    DBMS_OUTPUT.put_line (v_coun);
+    v_dif:= v_count -  v_coun;
+    DBMS_OUTPUT.put_line (v_dif);
+END;
+
+
+7)
+DECLARE
+    v_count NUMBER;
+    v_coun NUMBER;
+    v_cou NUMBER;
+    v_co NUMBER;
+    v_c NUMBER;
+BEGIN
+    SELECT COUNT(*) ,SUM(DECODE(TO_CHAR(hire_date, 'YYYY'),1995,1,0))"1995",SUM(DECODE(TO_CHAR(hire_date, 'YYYY'),1996,1,0))"1996",SUM(DECODE(TO_CHAR(hire_date, 'YYYY'),1997,1,0))"1997",SUM(DECODE(TO_CHAR(hire_date, 'YYYY'),1998,1,0))"1998" 
+    into v_count, v_coun , v_cou ,  v_co , v_c
+    FROM employees;
+    DBMS_OUTPUT.put_line (v_count);
+    DBMS_OUTPUT.put_line (v_coun);
+    DBMS_OUTPUT.put_line (v_cou);
+    DBMS_OUTPUT.put_line (v_co);
+    DBMS_OUTPUT.put_line (v_c);
+END;
+
+
+8)
+
+
+DECLARE
+    job_d varchar(20);
+    salary_n NUMBER;
+BEGIN
+    select job_id , salary
+    into job_d ,salary_n
+    from employees 
+    where salary = (select min(min_salary) from jobs where job_id = employees.job_id );
+    dbms_output.put_line(job_d || ' ' || salary_n);
+    exception
+    when too_many_rows then
+    dbms_output.put_line('Too many rows in the answer!');
+END;
+
+ 
+
+9)
+
+DECLARE
+    job_d varchar(20);
+    salary_n NUMBER;
+    empl_d NUMBER;
+BEGIN
+    SELECT employee_id, first_name , salary
+    into job_d , salary_n , empl_d
+    FROM employees  
+    WHERE salary > 
+    (SELECT AVG (salary)  
+    FROM employees ) AND  department_id IN ( SELECT department_id  FROM employees  WHERE first_name LIKE '%u%');
+    dbms_output.put_line(job_d || ' ' || salary_n || ' ' || empl_d);
+    exception
+    when too_many_rows then
+    dbms_output.put_line('Too many rows in the answer!');
+END;
+
+
+10)
+
+select employee_id, DECODE(job_id, 'AD_PRES', 'A', 'ST_MAN', 'B', 'IT_PROG', 'C', 'SA_REP', 'D', 'ST_CLERK', 'E', '0') as grade from employees;

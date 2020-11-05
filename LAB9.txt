@@ -1,0 +1,71 @@
+NOCOPY
+FORALL
+BULK COLLECT
+DETERMINISTIC
+RETURN
+BULK
+
+1)
+Call Duration (secs)
+--------------------
+Just IN OUT: ,05
+With NOCOPY: 0
+
+
+
+2)
+COMPILED
+
+
+
+24000
+17000
+6000
+
+
+29040
+20570
+7260
+
+
+3)
+set SERVEROUT on
+Create or REPLACE PROCEDURE get_deparmets IS
+TYPE t_dept IS TABLE OF departments%ROWTYPE INDEX BY BINARY_INTEGER;
+v_deptt t_dept;
+BEGIN
+SELECT * BULK COLLECT INTO v_deptt FROM departments;
+FOR i IN v_deptt.FIRST.. v_deptt.LAST LOOP
+IF v_deptt.EXISTS(i) THEN
+DBMS_OUTPUT.PUT_LINE(v_deptt(i).department_name);
+END IF;
+END LOOP;
+END get_deparmets;
+
+
+
+
+EXECUTE get_deparmets;
+
+
+4)
+
+CREATE TABLE emp_temp AS (SELECT * from employees);
+
+
+DECLARE
+ TYPE n IS TABLE OF employees.employee_id%TYPE;
+ enums n;
+ TYPE n IS TABLE OF employees.last_name%TYPE;
+ names n;
+BEGIN
+ DELETE FROM emp_temp
+ WHERE department_id = 20
+ RETURNING employee_id, last_name
+ BULK COLLECT INTO enums, names;
+ DBMS_OUTPUT.PUT_LINE ('Deleted ' || SQL%ROWCOUNT || ' rows:');
+ FOR i IN enums.FIRST .. enums.LAST
+ LOOP
+ DBMS_OUTPUT.PUT_LINE ('Employee #' || enums(i) || ': ' || names(i));
+ END LOOP;
+END;

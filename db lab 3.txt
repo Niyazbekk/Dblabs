@@ -1,0 +1,113 @@
+1)
+
+set serveroutput on
+DECLARE
+    sum_salary number;
+BEGIN
+    SELECT sum(salary)
+    into sum_salary
+    from employees 
+    where department_id = 60;
+    DBMS_OUTPUT.put_line(sum_salary);
+END;
+
+2)
+
+select count(*) from countries where region_id = (select region_id from regions where region_name = 'Europe');
+
+set serveroutput on
+DECLARE
+    num_c number;
+BEGIN
+    Select count(*)
+    into num_c
+    from countries
+    where region_id = (select region_id from regions where region_name = 'Europe');
+    
+    CASE
+        WHEN num_c < 10 THEN
+            DBMS_OUTPUT.PUT_LINE('less than 10 countries');
+        WHEN num_c >= 10 AND num_c <= 20 THEN 
+            DBMS_OUTPUT.PUT_LINE('between 10 and 20 countries');
+        WHEN num_c > 20 THEN 
+            DBMS_OUTPUT.PUT_LINE('more than 20 countries');
+    END CASE;
+END;
+/
+
+3)
+
+DECLARE
+    num_con_id CHAR := 1;
+    name_country VARCHAR2(40);
+    num_cont NUMBER := 1 ;
+BEGIN
+    LOOP
+        SELECT region_id
+        into num_con_id
+        from countries
+        where region_id = num_cont;
+        num_cont := num_cont + 1;
+        DBMS_OUTPUT.PUT_LINE('Countries are: '|| num_con_id);
+        EXIT WHEN num_cont > 3;
+    END LOOP;
+exception
+    when too_many_rows then
+    dbms_output.put_line('Too many rows in the answer!');
+END;
+/
+
+4)
+
+BEGIN
+FOR v_out IN 60..65 LOOP
+ FOR v_inn IN 100..110 LOOP
+ DBMS_OUTPUT.PUT_LINE(v_out||'-'||v_inn);
+ END LOOP;
+END LOOP;
+END; 
+
+6)
+
+BEGIN
+    UPDATE copy_emp_1
+    set salary = salary * 1.1
+    where manager_id = (select manager_id from departments where location_id = (select location_id from Locations where STATE_PROVINCE IN ( 'Alaska', 'California')));
+END;
+
+7 )
+
+
+BEGIN
+    UPDATE copy_emp_1
+    SET salary = salary + 100
+    where salary = (select min(avg(salary)) from copy_emp_1 group by department_id);
+END;
+
+8) 
+	select * from employees where (select sysdate from dual) - hire_date > 15;
+
+BEGIN
+    UPDATE copy_emp_1
+    SET manager_id = 1
+    where manager_id = null;
+END;
+
+9)
+
+BEGIN
+   INSERT INTO copy_emp_1 (employee_id ,first_name, Last_name , email , hire_date , job_id )
+   SELECT 5 , 'Niyaz' , 'Omar' , 'gs' , sysdate , '5'
+   FROM dual
+   WHERE NOT EXISTS ( SELECT * FROM copy_emp_1 WHERE first_name = 'Niyaz'  AND Last_name = 'Omar');
+END;
+
+
+
+10) 
+
+BEGIN
+	DELETE FROM contacts
+	WHERE (select sysdate from dual) - hire_date > 45;
+END;
+

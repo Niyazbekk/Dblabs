@@ -1,0 +1,158 @@
+1)
+
+ set SERVEROUT on
+DECLARE
+CURSOR cur_K IS
+Select name,nickname,beginreign,endreign from Kings where beginReign<1000 AND endReign>1000;
+v_name VARCHAR(40);
+v_nickname VARCHAR(40);
+beg_R NUMBER;
+end_R NUMBER;
+
+BEGIN
+OPEN cur_K;
+LOOP
+FETCH cur_K INTO v_name,v_nickname,beg_R,end_R;
+EXIT WHEN cur_K%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_name ||' '|| v_nickname ||' '|| beg_R ||' '|| end_R);
+END LOOP;
+CLOSE cur_K;
+END;
+
+
+2)
+
+set SERVEROUT on
+DECLARE
+CURSOR cur_K IS
+Select k.name,k.nickname,k.beginreign,k.endreign , k.parent_name from Kings k , Kings p where k.parent_name = p.name;
+v_name VARCHAR(40);
+v_nickname VARCHAR(40);
+beg_R NUMBER;
+end_R NUMBER;
+v_Parentname VARCHAR(40);
+
+BEGIN
+OPEN cur_K;
+LOOP
+FETCH cur_K INTO v_name,v_nickname,beg_R,end_R , v_Parentname;
+EXIT WHEN cur_K%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_name ||' '|| v_nickname ||' '|| beg_R ||' '|| end_R ||' '|| v_Parentname);
+END LOOP;
+CLOSE cur_K;
+END;
+
+3)
+
+set SERVEROUT on
+DECLARE
+CURSOR cur_K IS
+ Select name,nickname,beginreign,endreign,parent_name from Kings where (NOT nickname like 'The%');
+v_name VARCHAR(40);
+v_nickname VARCHAR(40);
+beg_R NUMBER;
+end_R NUMBER;
+v_Parentname VARCHAR(40);
+
+BEGIN
+OPEN cur_K;
+LOOP
+FETCH cur_K INTO v_name,v_nickname,beg_R,end_R , v_Parentname;
+EXIT WHEN cur_K%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_name ||' '|| v_nickname ||' '|| beg_R ||' '|| end_R ||' '|| v_Parentname);
+END LOOP;
+CLOSE cur_K;
+END;
+
+
+4)
+
+set SERVEROUT on
+DECLARE
+CURSOR cur_K IS
+SELECT parent_name FROM Kings GROUP by parent_name HAVING COUNT(*) > 1;
+v_Parentname VARCHAR(40);
+
+BEGIN
+OPEN cur_K;
+LOOP
+FETCH cur_K INTO v_Parentname;
+EXIT WHEN cur_K%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_Parentname);
+END LOOP;
+CLOSE cur_K;
+END;
+
+
+
+5)
+
+ set SERVEROUT on
+DECLARE
+CURSOR cur_K IS
+Select count(name) , house from Kings group by house;
+v_count NUMBER;
+v_house VARCHAR(40);
+
+BEGIN
+OPEN cur_K;
+LOOP
+FETCH cur_K INTO v_count , v_house;
+EXIT WHEN cur_K%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_count || ' ' || v_house);
+END LOOP;
+CLOSE cur_K;
+END;
+
+6)
+
+ set SERVEROUT on
+DECLARE
+CURSOR cur_K IS
+SELECT A.name, B.name
+FROM Kings A JOIN Kings B
+ON A.name<>B.name
+WHERE
+(
+A.BeginReign<B.BeginReign
+AND A.EndReign>B.EndReign
+)
+OR
+(
+B.BeginReign<A.BeginReign
+AND B.EndReign>A.EndReign
+)
+OR
+(
+A.BeginReign=B.BeginReign
+AND A.EndReign=B.EndReign
+)
+OR
+(
+A.BeginReign=B.BeginReign
+AND A.EndReign>B.EndReign
+AND B.BeginReign<>B.EndReign
+)
+OR
+(
+B.BeginReign=A.BeginReign
+AND B.EndReign>A.EndReign
+AND A.BeginReign<>A.EndReign
+)
+ORDER BY A.name,B.name;
+
+
+v_name VARCHAR(40);
+v_name1 VARCHAR(40);
+
+BEGIN
+OPEN cur_K;
+LOOP
+FETCH cur_K INTO v_name , v_name1;
+EXIT WHEN cur_K%NOTFOUND;
+DBMS_OUTPUT.PUT_LINE(v_name || ' ' || v_name1);
+END LOOP;
+CLOSE cur_K;
+END;
+
+
