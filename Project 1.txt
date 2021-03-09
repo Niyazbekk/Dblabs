@@ -5,7 +5,6 @@ INSERT INTO ships (name, yearLaunched, country, numGuns , gunSize , displacement
 VALUES ('Shimakaze' , 1942 , 'JP' , 9 , 16 , 33000);
 
 
-1) 
 
 set serveroutput on
 
@@ -19,8 +18,6 @@ Begin
     dbms_output.put_line(v_name);
     dbms_output.put_line(v_year);
 END;
-
-2)
 
 set serveroutput on
 
@@ -36,10 +33,6 @@ Begin
     dbms_output.put_line(v_year);
     dbms_output.put_line(v_gun_size);
 END;
-
-
-3)
-
 
 
 set serveroutput on
@@ -58,17 +51,12 @@ Begin
 END;
 
 
-
-4) 
-
 DECLARE
     Cursor emp_cur IS 
         select avg(gunsize) ,country from ships group by country;
 BEGIN
      DBMS_OUTPUT.PUT_LINE('a');
 END;
-
-5)
 
 set serveroutput on
 DECLARE
@@ -91,8 +79,6 @@ BEGIN
 END;
 
 
-
-6)
 
 SELECT country,SUM(CASE WHEN result_b = 'sunk' THEN 1 ELSE 0 END) AS TotalShipSunk 
 FROM ships 
