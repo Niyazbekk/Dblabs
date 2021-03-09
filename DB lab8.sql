@@ -1,4 +1,4 @@
-1)
+
 SET SERVEROUT ON
 CREATE OR REPLACE PROCEDURE Ins_us(
 p_name IN OUT users.name%TYPE,
@@ -41,7 +41,7 @@ DBMS_OUTPUT.PUT_LINE('NAME : ' || v_name || ' ID : ' || v_id || ' SALARY : ' || 
 END;
 
 
-2)
+
 CREATE TABLE users1(
 id NUMBER,
 NAME VARCHAR(255),
@@ -87,7 +87,7 @@ END;
 
 
 
-3)
+
 
 Set SERVEROUT ON
 CREATE OR REPLACE PROCEDURE Break_even_point(
@@ -121,9 +121,6 @@ BEGIN
 v_month := &month;
 Break_even_point(v_month);
 END;
-
-4)
-
 
 
 
